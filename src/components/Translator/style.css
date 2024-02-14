@@ -1,0 +1,18 @@
+.translator_container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.translator_container .title {
+    font-weight: 500;
+}
+
+.translator_container .buttons_container {
+    position: relative;
+    margin-top: 10px;
+}
