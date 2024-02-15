@@ -1,6 +1,6 @@
 const languageOptions = [
     {
-        label: 'Türkçe',
+        label: 'Turkish',
         value: 'tr'
     },
     {
@@ -8,39 +8,39 @@ const languageOptions = [
         value: 'en'
     },
     {
-        label: 'Français',
+        label: 'French',
         value: 'fr',
     },
     {
-        label: 'Deutsch',
+        label: 'German',
         value: 'de',
     },
     {
-        label: 'Italiano',
+        label: 'Italian',
         value: 'it',
     },
     {
-        label: 'Português',
+        label: 'Portuguese',
         value: 'pt',
     },
     {
-        label: 'Español',
+        label: 'Spanish',
         value: 'es',
     },
     {
-        label: 'عربي',
+        label: 'Arabic',
         value: 'ar',
     },
     {
-        label: '中国人',
+        label: 'Chinese',
         value: 'yue',
     },
     {
-        label: 'Русский',
+        label: 'Russian',
         value: 'ru',
     },
     {
-        label: 'हिंदी',
+        label: 'Indian',
         value: 'hi',
     },
 ];

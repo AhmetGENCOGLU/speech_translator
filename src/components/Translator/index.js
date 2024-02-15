@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import "./style.css";
+import React, { memo, useCallback, useEffect, useMemo, useState } from "react";
+import "./style.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMicrophone, faRetweet } from "@fortawesome/free-solid-svg-icons";
 import { TranslateService } from "../../services/translate";
@@ -29,6 +29,15 @@ const Translator = () => {
     []
   );
 
+  const speak = useCallback(
+    (text) => {
+      speechSynthesisUtterance.text = text;
+      speechSynthesisUtterance.lang = to;
+      speechSynthesis.speak(speechSynthesisUtterance);
+    },
+    [speechSynthesisUtterance, to]
+  );
+
   const translate = useCallback(() => {
     setTranslating(true);
     translateService
@@ -38,18 +47,16 @@ const Translator = () => {
         q: value,
       })
       .then((response) => {
-        speechSynthesisUtterance.text = response.data[0];
-        speechSynthesisUtterance.lang = to;
-        speechSynthesis.speak(speechSynthesisUtterance);
-        setValue("");
+        speak(response.data[0]);
       })
       .catch((error) => {
         console.error(error);
       })
       .finally(() => {
+        setValue("");
         setTranslating(false);
       });
-  }, [from, speechSynthesisUtterance, to, translateService, value]);
+  }, [from, speak, to, translateService, value]);
 
   useEffect(() => {
     if (speechRecognition) {
@@ -149,4 +156,4 @@ const Translator = () => {
   );
 };
 
-export default Translator;
+export default memo(Translator);
