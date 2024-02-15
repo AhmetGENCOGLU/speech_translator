@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import "./style.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMicrophone, faVolumeHigh } from "@fortawesome/free-solid-svg-icons";
+import { faMicrophone } from "@fortawesome/free-solid-svg-icons";
 
 const Translator = () => {
   const [listening, setListening] = useState(false);
@@ -18,6 +18,16 @@ const Translator = () => {
 
   const speechSynthesisUtterance = useMemo(() => new SpeechSynthesisUtterance(), []);
 
+  const translate = useCallback(
+    () => {
+        speechSynthesisUtterance.text = value;
+        speechSynthesisUtterance.lang = "en-US";
+        speechSynthesis.speak(speechSynthesisUtterance);
+        setValue('');
+    },
+    [speechSynthesisUtterance, value],
+  )
+
   useEffect(() => {
     if (speechRecognition) {
       speechRecognition.onresult = (event) => {
@@ -31,17 +41,14 @@ const Translator = () => {
       };
 
       speechRecognition.onend = () => {
-        speechSynthesisUtterance.text = value;
-        speechSynthesisUtterance.lang = "en-US";
-        speechSynthesis.speak(speechSynthesisUtterance);
-        setValue('');
+        translate()
       }
     }
 
     return () => {
       speechRecognition?.stop();
     };
-  }, [speechRecognition, value, speechSynthesisUtterance]);
+  }, [speechRecognition, translate]);
 
   const onClickMicrophone = () => {
     if (listening) {
@@ -58,11 +65,7 @@ const Translator = () => {
       <div className="title">You speak, We translate!</div>
       <div className="buttons_container">
         <button onClick={onClickMicrophone}>
-          {speechSynthesis.speaking ? (
-            <FontAwesomeIcon icon={faVolumeHigh} />
-          ) : (
-            <FontAwesomeIcon icon={faMicrophone} />
-          )}
+          <FontAwesomeIcon icon={faMicrophone} color={listening && 'red'} />
         </button>
       </div>
     </div>
