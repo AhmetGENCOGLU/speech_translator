@@ -6,13 +6,22 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
+    margin-top: 8px;
 }
 
 .translator_container .title {
     font-weight: 500;
 }
 
-.translator_container .buttons_container {
+.translator_container .language_selection_container {
     position: relative;
-    margin-top: 10px;
+    margin-block: 5px;
+}
+
+.translator_container .ant-btn {
+    margin-inline: 5px;
+}
+
+.translator_container .ant-select {
+    width: 100px;
 }
