@@ -131,6 +131,7 @@ const Translator = () => {
           value={from}
           onChange={onChangeFrom}
           disabled={isDisabledLanguageSelection()}
+          listHeight={100}
         />
         <Button
           onClick={onClickReplaceFromAndTo}
@@ -145,6 +146,7 @@ const Translator = () => {
           value={to}
           onChange={onChangeTo}
           disabled={isDisabledLanguageSelection()}
+          listHeight={100}
         />
       </div>
       <div>
