@@ -9,8 +9,6 @@ import { setFromToInitialValues } from "../../utils/helpers";
 
 const Translator = () => {
   const [listening, setListening] = useState(false);
-  const [value, setValue] = useState("");
-  const [translating, setTranslating] = useState(false);
   let [from, setFrom] = useState(setFromToInitialValues("from", "tr"));
   let [to, setTo] = useState(setFromToInitialValues("to", "en"));
 
@@ -38,8 +36,9 @@ const Translator = () => {
     [speechSynthesisUtterance, to]
   );
 
-  const translate = useCallback(() => {
-    setTranslating(true);
+  const translate = useCallback((value) => {
+    if (!value) return;
+
     translateService
       .translate({
         from,
@@ -52,26 +51,18 @@ const Translator = () => {
       .catch((error) => {
         console.error(error);
       })
-      .finally(() => {
-        setValue("");
-        setTranslating(false);
-      });
-  }, [from, speak, to, translateService, value]);
+  }, [from, speak, to, translateService]);
 
   useEffect(() => {
     if (speechRecognition) {
       speechRecognition.onresult = (event) => {
         const current = event.resultIndex;
         const { transcript } = event.results[current][0];
-        setValue((prevState) => `${prevState} ${transcript}`);
+        translate(transcript);
       };
 
       speechRecognition.onerror = () => {
         setListening(false);
-      };
-
-      speechRecognition.onend = () => {
-        translate();
       };
     }
 
@@ -114,9 +105,7 @@ const Translator = () => {
     setLocalStorage({ from, to: val });
   };
 
-  const isDisabledLanguageSelection = () => translating || listening;
-
-  const isDisabledMicrophone = () => translating;
+  const isDisabledLanguageSelection = () => listening;
 
   const setMicrophoneColor = () => (listening ? "red" : "black");
 
@@ -150,7 +139,7 @@ const Translator = () => {
         />
       </div>
       <div>
-        <Button onClick={onClickMicrophone} disabled={isDisabledMicrophone()}>
+        <Button onClick={onClickMicrophone}>
           <FontAwesomeIcon icon={faMicrophone} color={setMicrophoneColor()} />
         </Button>
       </div>
