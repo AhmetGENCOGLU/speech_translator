@@ -37,6 +37,8 @@ const languageOptions = [
     },
 ];
 
+const subtitleClassname = 'speech_translator_subtitle';
+
 const localStorageFromToKey = 'speech_translator_from_to';
 
-export { languageOptions, localStorageFromToKey }
+export { languageOptions, localStorageFromToKey, subtitleClassname }

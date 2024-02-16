@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMicrophone, faRetweet } from "@fortawesome/free-solid-svg-icons";
 import { TranslateService } from "../../services/translate";
 import { Button, Select } from "antd";
-import { languageOptions, localStorageFromToKey } from "../../constants";
+import { languageOptions, localStorageFromToKey, subtitleClassname } from "../../constants";
 import { setFromToInitialValues } from "../../utils/helpers";
 
 const Translator = () => {
@@ -63,8 +63,7 @@ const Translator = () => {
       // eslint-disable-next-line no-undef
       chrome.scripting.executeScript({
         target: { tabId: tab.id },
-        func: () => {
-          const subtitleClassname = 'speech_translator_subtitle';
+        func: (text, subtitleClassname) => {
           let existElement = document.getElementsByClassName(subtitleClassname)[0];
           if (!existElement) {
             existElement = document.createElement("div");
@@ -74,24 +73,54 @@ const Translator = () => {
             existElement.style.left = "50%";
             existElement.style.transform = "translateX(-50%)";
             existElement.style.background = "white";
+            existElement.style.padding = "10px";
+            existElement.style.borderRadius = "2px";
+            existElement.style.boxShadow = "0 0 5px black";
+            existElement.style.maxWidth = "500px";
             existElement.style.zIndex = 1000;
             existElement.textContent = text;
             document.body.appendChild(existElement);
           }
           existElement.textContent = text;
         },
+        args: [text, subtitleClassname],
       });
       },
     [],
   )
+
+  const removeSubtitle = useCallback(
+    async () => {
+      // eslint-disable-next-line no-undef
+      let [tab] = await chrome.tabs.query({ active: true });
+      // eslint-disable-next-line no-undef
+      chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: (subtitleClassname) => {
+          let existElement = document.getElementsByClassName(subtitleClassname)[0];
+          if (existElement) {
+            existElement.remove();
+          }
+        },
+        args: [subtitleClassname],
+      });
+      },
+    [],
+  )
+
+  useEffect(() => { // TODO
+    return () => {
+      removeSubtitle()
+    }
+  }, [removeSubtitle])
 
   useEffect(() => {
     if (speechRecognition) {
       speechRecognition.onresult = (event) => {
         const current = event.resultIndex;
         const { transcript } = event.results[current][0];
-        // setSubtitle(transcript)
-        translate(transcript);
+        setSubtitle(transcript) // TODO
+        // translate(transcript);
       };
 
       speechRecognition.onerror = () => {
@@ -102,7 +131,7 @@ const Translator = () => {
     return () => {
       speechRecognition?.stop();
     };
-  }, [speechRecognition, translate]);
+  }, [speechRecognition, setSubtitle]);
 
   const onClickMicrophone = () => {
     if (listening) {
