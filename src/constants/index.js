@@ -28,14 +28,6 @@ const languageOptions = [
         value: 'es',
     },
     {
-        label: 'Arabic',
-        value: 'ar',
-    },
-    {
-        label: 'Chinese',
-        value: 'yue',
-    },
-    {
         label: 'Russian',
         value: 'ru',
     },

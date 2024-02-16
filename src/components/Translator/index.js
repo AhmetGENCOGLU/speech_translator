@@ -36,28 +36,61 @@ const Translator = () => {
     [speechSynthesisUtterance, to]
   );
 
-  const translate = useCallback((value) => {
-    if (!value) return;
+  const translate = useCallback(
+    (value) => {
+      if (!value) return;
 
-    translateService
-      .translate({
-        from,
-        to,
-        q: value,
-      })
-      .then((response) => {
-        speak(response.data[0]);
-      })
-      .catch((error) => {
-        console.error(error);
-      })
-  }, [from, speak, to, translateService]);
+      translateService
+        .translate({
+          from,
+          to,
+          q: value,
+        })
+        .then((response) => {
+          speak(response.data[0]);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
+    [from, speak, to, translateService]
+  );
+
+  const setSubtitle = useCallback(
+    async (text) => {
+      // eslint-disable-next-line no-undef
+      let [tab] = await chrome.tabs.query({ active: true });
+      // eslint-disable-next-line no-undef
+      chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: () => {
+          const subtitleClassname = 'speech_translator_subtitle';
+          let existElement = document.getElementsByClassName(subtitleClassname)[0];
+          if (!existElement) {
+            existElement = document.createElement("div");
+            existElement.classList.add(subtitleClassname);
+            existElement.style.position = "fixed";
+            existElement.style.bottom = "50px";
+            existElement.style.left = "50%";
+            existElement.style.transform = "translateX(-50%)";
+            existElement.style.background = "white";
+            existElement.style.zIndex = 1000;
+            existElement.textContent = text;
+            document.body.appendChild(existElement);
+          }
+          existElement.textContent = text;
+        },
+      });
+      },
+    [],
+  )
 
   useEffect(() => {
     if (speechRecognition) {
       speechRecognition.onresult = (event) => {
         const current = event.resultIndex;
         const { transcript } = event.results[current][0];
+        // setSubtitle(transcript)
         translate(transcript);
       };
 
