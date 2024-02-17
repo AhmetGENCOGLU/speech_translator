@@ -36,26 +36,6 @@ const Translator = () => {
     [speechSynthesisUtterance, to]
   );
 
-  const translate = useCallback(
-    (value) => {
-      if (!value) return;
-
-      translateService
-        .translate({
-          from,
-          to,
-          q: value,
-        })
-        .then((response) => {
-          speak(response.data[0]);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    },
-    [from, speak, to, translateService]
-  );
-
   const setSubtitle = useCallback(
     async (text) => {
       // eslint-disable-next-line no-undef
@@ -78,11 +58,16 @@ const Translator = () => {
             existElement.style.boxShadow = "0 0 5px black";
             existElement.style.maxWidth = "500px";
             existElement.style.fontSize = "20px";
+            existElement.style.pointerEvents = "none";
             existElement.style.zIndex = 1000;
             existElement.textContent = text;
             document.body.appendChild(existElement);
           }
           existElement.textContent = text;
+
+          setTimeout(() => {
+            existElement.remove();
+          }, 2000);
         },
         args: [text, subtitleClassname],
       });
@@ -90,38 +75,34 @@ const Translator = () => {
     [],
   )
 
-  const removeSubtitle = useCallback(
-    async () => {
-      // eslint-disable-next-line no-undef
-      let [tab] = await chrome.tabs.query({ active: true });
-      // eslint-disable-next-line no-undef
-      chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        func: (subtitleClassname) => {
-          let existElement = document.querySelector(`.${subtitleClassname}`)
-          if (existElement) {
-            existElement.remove();
-          }
-        },
-        args: [subtitleClassname],
-      });
-      },
-    [],
-  )
+  const translate = useCallback(
+    (value) => {
+      if (!value) return;
 
-  useEffect(() => { // TODO
-    return () => {
-      removeSubtitle()
-    }
-  }, [removeSubtitle])
+      translateService
+        .translate({
+          from,
+          to,
+          q: value,
+        })
+        .then((response) => {
+          const text = response.data[0];
+          speak(text);
+          setSubtitle(text);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
+    [from, setSubtitle, speak, to, translateService]
+  );
 
   useEffect(() => {
     if (speechRecognition) {
       speechRecognition.onresult = (event) => {
         const current = event.resultIndex;
         const { transcript } = event.results[current][0];
-        setSubtitle(transcript) // TODO
-        // translate(transcript);
+        translate(transcript);
       };
 
       speechRecognition.onerror = () => {
@@ -132,7 +113,7 @@ const Translator = () => {
     return () => {
       speechRecognition?.stop();
     };
-  }, [speechRecognition, setSubtitle]);
+  }, [speechRecognition, translate]);
 
   const onClickMicrophone = () => {
     if (listening) {
