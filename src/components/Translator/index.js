@@ -44,29 +44,29 @@ const Translator = () => {
       chrome.scripting.executeScript({
         target: { tabId: tab.id },
         func: (text, subtitleClassname) => {
-          let existElement = document.querySelector(`.${subtitleClassname}`);
-          if (!existElement) {
-            existElement = document.createElement("div");
-            existElement.classList.add(subtitleClassname);
-            existElement.style.position = "fixed";
-            existElement.style.bottom = "50px";
-            existElement.style.left = "50%";
-            existElement.style.transform = "translateX(-50%)";
-            existElement.style.background = "white";
-            existElement.style.padding = "10px";
-            existElement.style.borderRadius = "2px";
-            existElement.style.boxShadow = "0 0 5px black";
-            existElement.style.maxWidth = "500px";
-            existElement.style.fontSize = "20px";
-            existElement.style.pointerEvents = "none";
-            existElement.style.zIndex = 1000;
-            existElement.textContent = text;
-            document.body.appendChild(existElement);
+          let subtitleElement = document.querySelector(`.${subtitleClassname}`);
+          if (!subtitleElement) {
+            subtitleElement = document.createElement("div");
+            subtitleElement.classList.add(subtitleClassname);
+            subtitleElement.style.position = "fixed";
+            subtitleElement.style.bottom = "50px";
+            subtitleElement.style.left = "50%";
+            subtitleElement.style.transform = "translateX(-50%)";
+            subtitleElement.style.background = "white";
+            subtitleElement.style.padding = "10px";
+            subtitleElement.style.borderRadius = "2px";
+            subtitleElement.style.boxShadow = "0 0 5px black";
+            subtitleElement.style.maxWidth = "500px";
+            subtitleElement.style.fontSize = "20px";
+            subtitleElement.style.pointerEvents = "none";
+            subtitleElement.style.zIndex = 1000;
+            subtitleElement.textContent = text;
+            document.body.appendChild(subtitleElement);
           }
-          existElement.textContent = text;
+          subtitleElement.textContent = text;
 
           setTimeout(() => {
-            existElement.remove();
+            subtitleElement.remove();
           }, 2000);
         },
         args: [text, subtitleClassname],
