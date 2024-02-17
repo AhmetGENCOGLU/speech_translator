@@ -64,7 +64,7 @@ const Translator = () => {
       chrome.scripting.executeScript({
         target: { tabId: tab.id },
         func: (text, subtitleClassname) => {
-          let existElement = document.getElementsByClassName(subtitleClassname)[0];
+          let existElement = document.querySelector(`.${subtitleClassname}`);
           if (!existElement) {
             existElement = document.createElement("div");
             existElement.classList.add(subtitleClassname);
@@ -77,6 +77,7 @@ const Translator = () => {
             existElement.style.borderRadius = "2px";
             existElement.style.boxShadow = "0 0 5px black";
             existElement.style.maxWidth = "500px";
+            existElement.style.fontSize = "20px";
             existElement.style.zIndex = 1000;
             existElement.textContent = text;
             document.body.appendChild(existElement);
@@ -97,7 +98,7 @@ const Translator = () => {
       chrome.scripting.executeScript({
         target: { tabId: tab.id },
         func: (subtitleClassname) => {
-          let existElement = document.getElementsByClassName(subtitleClassname)[0];
+          let existElement = document.querySelector(`.${subtitleClassname}`)
           if (existElement) {
             existElement.remove();
           }
