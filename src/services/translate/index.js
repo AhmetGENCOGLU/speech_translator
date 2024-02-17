@@ -4,5 +4,4 @@ class TranslateService {
     translate = (data) => Api.post('/t', data)
 }
 
-
 export { TranslateService }
