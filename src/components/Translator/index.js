@@ -32,11 +32,22 @@ const Translator = () => {
   const speak = useCallback(
     (text) => {
       speechSynthesisUtterance.text = text;
-      speechSynthesisUtterance.lang = to;
       speechSynthesis.speak(speechSynthesisUtterance);
     },
-    [speechSynthesisUtterance, to]
+    [speechSynthesisUtterance]
   );
+
+  useEffect(() => {
+    if (speechRecognition && from) {
+      speechRecognition.lang = from;
+    }
+  }, [speechRecognition, from])
+
+  useEffect(() => {
+    if (speechSynthesisUtterance && to) {
+      speechSynthesisUtterance.lang = to;
+    }
+  }, [speechSynthesisUtterance, to])
 
   const setSubtitle = useCallback(
     async (text) => {
@@ -123,7 +134,6 @@ const Translator = () => {
       speechRecognition.stop();
       setListening(false);
     } else {
-      speechRecognition.lang = from;
       speechRecognition.start();
       setListening(true);
     }
@@ -152,8 +162,6 @@ const Translator = () => {
     setLocalStorage({ from, to: val });
   };
 
-  const isDisabledLanguageSelection = () => listening;
-
   const setMicrophoneColor = () => (listening ? "red" : "black");
 
   const onClickAudioButton = () => {
@@ -174,12 +182,10 @@ const Translator = () => {
           options={languageOptions}
           value={from}
           onChange={onChangeFrom}
-          disabled={isDisabledLanguageSelection()}
           listHeight={100}
         />
         <Button
           onClick={onClickReplaceFromAndTo}
-          disabled={isDisabledLanguageSelection()}
         >
           <FontAwesomeIcon icon={faRetweet} />
         </Button>
@@ -189,7 +195,6 @@ const Translator = () => {
           options={languageOptions}
           value={to}
           onChange={onChangeTo}
-          disabled={isDisabledLanguageSelection()}
           listHeight={100}
         />
       </div>
