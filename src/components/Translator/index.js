@@ -1,9 +1,9 @@
 import React, { memo, useCallback, useEffect, useMemo, useState } from "react";
 import "./style.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMicrophone, faRetweet } from "@fortawesome/free-solid-svg-icons";
+import { faAlignLeft, faMicrophone, faRetweet, faVolumeMute, faVolumeUp } from "@fortawesome/free-solid-svg-icons";
 import { TranslateService } from "../../services/translate";
-import { Button, Select } from "antd";
+import { Button, Select, Tooltip } from "antd";
 import { languageOptions, localStorageFromToKey, subtitleClassname } from "../../constants";
 import { setFromToInitialValues } from "../../utils/helpers";
 
@@ -11,6 +11,8 @@ const Translator = () => {
   const [listening, setListening] = useState(false);
   let [from, setFrom] = useState(setFromToInitialValues("from", "tr"));
   let [to, setTo] = useState(setFromToInitialValues("to", "en"));
+  const [muted, setMuted] = useState(false);
+  const [showSubtitle, setShowSubtitle] = useState(true);
 
   const translateService = useMemo(() => new TranslateService(), []);
 
@@ -77,7 +79,7 @@ const Translator = () => {
 
   const translate = useCallback(
     (value) => {
-      if (!value) return;
+      if (!value || (muted && !showSubtitle)) return;
 
       translateService
         .translate({
@@ -87,14 +89,19 @@ const Translator = () => {
         })
         .then((response) => {
           const text = response.data[0];
-          speak(text);
-          setSubtitle(text);
+          if (!muted) {
+            speak(text);
+          }
+          
+          if (showSubtitle) {
+            setSubtitle(text);
+          }
         })
         .catch((error) => {
           console.error(error);
         });
     },
-    [from, setSubtitle, speak, to, translateService]
+    [from, muted, setSubtitle, showSubtitle, speak, to, translateService]
   );
 
   useEffect(() => {
@@ -109,10 +116,6 @@ const Translator = () => {
         setListening(false);
       };
     }
-
-    return () => {
-      speechRecognition?.stop();
-    };
   }, [speechRecognition, translate]);
 
   const onClickMicrophone = () => {
@@ -153,6 +156,14 @@ const Translator = () => {
 
   const setMicrophoneColor = () => (listening ? "red" : "black");
 
+  const onClickAudioButton = () => {
+    setMuted((prevState) => !prevState);
+  }
+
+  const onClickSubtitleButton = () => {
+    setShowSubtitle((prevState) => !prevState);
+  }
+
   return (
     <div className="translator_container">
       <div className="title">You speak, We translate!</div>
@@ -186,6 +197,22 @@ const Translator = () => {
         <Button onClick={onClickMicrophone}>
           <FontAwesomeIcon icon={faMicrophone} color={setMicrophoneColor()} />
         </Button>
+      </div>
+      <div className="bottom_section">
+        <Tooltip title='Audio' placement="topRight">
+          <Button onClick={onClickAudioButton}>
+            {muted ? (
+              <FontAwesomeIcon icon={faVolumeMute} color="red" />
+            ) : (
+              <FontAwesomeIcon icon={faVolumeUp} color="green" />
+            )}
+          </Button>
+        </Tooltip>
+        <Tooltip title='Subtitle' placement="topRight">
+          <Button onClick={onClickSubtitleButton}>
+            <FontAwesomeIcon icon={faAlignLeft} color={ showSubtitle ? 'red' : 'black' } />
+          </Button>
+        </Tooltip>
       </div>
     </div>
   );
