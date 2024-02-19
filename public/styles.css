@@ -1,0 +1,15 @@
+.speech_translator_subtitle {
+    position: fixed;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: white;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 5px black;
+    max-width: 500px;
+    font-size: 20px;
+    pointer-events: none;
+    z-index: 1000;
+    font-weight: 500;
+}

@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import React, { memo, useCallback, useEffect, useMemo, useState } from "react";
 import "./style.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -51,9 +52,7 @@ const Translator = () => {
 
   const setSubtitle = useCallback(
     async (text) => {
-      // eslint-disable-next-line no-undef
       let [tab] = await chrome.tabs.query({ active: true });
-      // eslint-disable-next-line no-undef
       chrome.scripting.executeScript({
         target: { tabId: tab.id },
         func: (text, subtitleClassname) => {
@@ -61,18 +60,6 @@ const Translator = () => {
           if (!subtitleElement) {
             subtitleElement = document.createElement("div");
             subtitleElement.classList.add(subtitleClassname);
-            subtitleElement.style.position = "fixed";
-            subtitleElement.style.bottom = "50px";
-            subtitleElement.style.left = "50%";
-            subtitleElement.style.transform = "translateX(-50%)";
-            subtitleElement.style.background = "white";
-            subtitleElement.style.padding = "10px";
-            subtitleElement.style.borderRadius = "2px";
-            subtitleElement.style.boxShadow = "0 0 5px black";
-            subtitleElement.style.maxWidth = "500px";
-            subtitleElement.style.fontSize = "20px";
-            subtitleElement.style.pointerEvents = "none";
-            subtitleElement.style.zIndex = 1000;
             subtitleElement.textContent = text;
             document.body.appendChild(subtitleElement);
           }
