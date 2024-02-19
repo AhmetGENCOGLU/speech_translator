@@ -2,10 +2,20 @@
 import React, { memo, useCallback, useEffect, useMemo, useState } from "react";
 import "./style.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAlignLeft, faMicrophone, faRetweet, faVolumeMute, faVolumeUp } from "@fortawesome/free-solid-svg-icons";
+import {
+  faAlignLeft,
+  faMicrophone,
+  faRetweet,
+  faVolumeMute,
+  faVolumeUp,
+} from "@fortawesome/free-solid-svg-icons";
 import { TranslateService } from "../../services/translate";
 import { Button, Select, Tooltip } from "antd";
-import { languageOptions, localStorageFromToKey, subtitleClassname } from "../../constants";
+import {
+  languageOptions,
+  localStorageFromToKey,
+  subtitleClassname,
+} from "../../constants";
 import { setFromToInitialValues } from "../../utils/helpers";
 
 const Translator = () => {
@@ -42,38 +52,35 @@ const Translator = () => {
     if (speechRecognition && from) {
       speechRecognition.lang = from;
     }
-  }, [speechRecognition, from])
+  }, [speechRecognition, from]);
 
   useEffect(() => {
     if (speechSynthesisUtterance && to) {
       speechSynthesisUtterance.lang = to;
     }
-  }, [speechSynthesisUtterance, to])
+  }, [speechSynthesisUtterance, to]);
 
-  const setSubtitle = useCallback(
-    async (text) => {
-      let [tab] = await chrome.tabs.query({ active: true });
-      chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        func: (text, subtitleClassname) => {
-          let subtitleElement = document.querySelector(`.${subtitleClassname}`);
-          if (!subtitleElement) {
-            subtitleElement = document.createElement("div");
-            subtitleElement.classList.add(subtitleClassname);
-            subtitleElement.textContent = text;
-            document.body.appendChild(subtitleElement);
-          }
+  const setSubtitle = useCallback(async (text) => {
+    let [tab] = await chrome.tabs.query({ active: true });
+    chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      func: (text, subtitleClassname) => {
+        let subtitleElement = document.querySelector(`.${subtitleClassname}`);
+        if (!subtitleElement) {
+          subtitleElement = document.createElement("div");
+          subtitleElement.classList.add(subtitleClassname);
           subtitleElement.textContent = text;
+          document.body.appendChild(subtitleElement);
+        }
+        subtitleElement.textContent = text;
 
-          setTimeout(() => {
-            subtitleElement.remove();
-          }, 2000);
-        },
-        args: [text, subtitleClassname],
-      });
+        setTimeout(() => {
+          subtitleElement.remove();
+        }, 2000);
       },
-    [],
-  )
+      args: [text, subtitleClassname],
+    });
+  }, []);
 
   const translate = useCallback(
     (value) => {
@@ -90,7 +97,7 @@ const Translator = () => {
           if (!muted) {
             speak(text);
           }
-          
+
           if (showSubtitle) {
             setSubtitle(text);
           }
@@ -149,15 +156,24 @@ const Translator = () => {
     setLocalStorage({ from, to: val });
   };
 
-  const setMicrophoneColor = () => (listening ? "red" : "black");
+  const setMicrophoneIconColor = () => (listening ? "red" : "black");
+
+  const setSubtitleIconColor = () => (showSubtitle ? "red" : "black");
+
+  const setAudioIcon = () =>
+    muted ? (
+      <FontAwesomeIcon icon={faVolumeMute} color="red" />
+    ) : (
+      <FontAwesomeIcon icon={faVolumeUp} color="green" />
+    );
 
   const onClickAudioButton = () => {
     setMuted((prevState) => !prevState);
-  }
+  };
 
   const onClickSubtitleButton = () => {
     setShowSubtitle((prevState) => !prevState);
-  }
+  };
 
   return (
     <div className="translator_container">
@@ -171,9 +187,7 @@ const Translator = () => {
           onChange={onChangeFrom}
           listHeight={100}
         />
-        <Button
-          onClick={onClickReplaceFromAndTo}
-        >
+        <Button onClick={onClickReplaceFromAndTo}>
           <FontAwesomeIcon icon={faRetweet} />
         </Button>
         <Select
@@ -187,22 +201,19 @@ const Translator = () => {
       </div>
       <div>
         <Button onClick={onClickMicrophone}>
-          <FontAwesomeIcon icon={faMicrophone} color={setMicrophoneColor()} />
+          <FontAwesomeIcon icon={faMicrophone} color={setMicrophoneIconColor()} />
         </Button>
       </div>
       <div className="bottom_section">
-        <Tooltip title='Audio' placement="topRight">
-          <Button onClick={onClickAudioButton}>
-            {muted ? (
-              <FontAwesomeIcon icon={faVolumeMute} color="red" />
-            ) : (
-              <FontAwesomeIcon icon={faVolumeUp} color="green" />
-            )}
-          </Button>
+        <Tooltip title="Audio" placement="topRight">
+          <Button onClick={onClickAudioButton}>{setAudioIcon()}</Button>
         </Tooltip>
-        <Tooltip title='Subtitle' placement="topRight">
+        <Tooltip title="Subtitle" placement="topRight">
           <Button onClick={onClickSubtitleButton}>
-            <FontAwesomeIcon icon={faAlignLeft} color={ showSubtitle ? 'red' : 'black' } />
+            <FontAwesomeIcon
+              icon={faAlignLeft}
+              color={setSubtitleIconColor()}
+            />
           </Button>
         </Tooltip>
       </div>
