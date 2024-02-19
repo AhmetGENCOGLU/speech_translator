@@ -175,6 +175,9 @@ const Translator = () => {
     setShowSubtitle((prevState) => !prevState);
   };
 
+  const filterLangOption = (input, option) =>
+    (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
+
   return (
     <div className="translator_container">
       <div className="title">You speak, We translate!</div>
@@ -186,6 +189,8 @@ const Translator = () => {
           value={from}
           onChange={onChangeFrom}
           listHeight={100}
+          filterOption={filterLangOption}
+          optionFilterProp="children"
         />
         <Button onClick={onClickReplaceFromAndTo}>
           <FontAwesomeIcon icon={faRetweet} />
@@ -197,11 +202,16 @@ const Translator = () => {
           value={to}
           onChange={onChangeTo}
           listHeight={100}
+          filterOption={filterLangOption}
+          optionFilterProp="children"
         />
       </div>
       <div>
         <Button onClick={onClickMicrophone}>
-          <FontAwesomeIcon icon={faMicrophone} color={setMicrophoneIconColor()} />
+          <FontAwesomeIcon
+            icon={faMicrophone}
+            color={setMicrophoneIconColor()}
+          />
         </Button>
       </div>
       <div className="bottom_section">
